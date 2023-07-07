@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+ <html>
+    <head>
+        <title>Amazone Shopping</title>
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    
+        <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+        <script>
+            var categories = ["Select a Category", "Electronics", "Footwear", "Fashion"];
+            var electronics = ["Select Electronic Product","Samsung Mobile", "boAt NeckBand"];
+            var footwear = ["Select Footwear", "Nike Casuals", "Lee Cooper Boot"];
+            var fashion = ["Select Fashion", "Backpack", "Mens Cotton Jacket"];
+            
+            var Product =[{name:'Samsung Mobile', Price:20000, Photo: './assets/Mobile.jpg' },
+            {name:'boAt NeckBand', Price:2000, Photo: './assets/BoatneckBand.png' },
+            {name:'Nike Casuals', Price:4000, Photo: './assets/NikeCasuals.jpg' } ,       
+            {name:'Lee Cooper Boot', Price:20000, Photo: './assets/RedcheefBoot.jpg' },
+            {name:'Backpack', Price:20000, Photo: './assets/Bagpack.jpg' },
+            {name:'Mens Cotton Jacket', Price:20000, Photo: './assets/MensJacket.jpg' }
+             ]
+           function bodyload(){
+                for(var item of categories){
+                 var option=document.createElement("option");
+                 option.value=item;
+                 option.text=item;
+                 document.getElementById("Category").appendChild(option);
+
+                }
+
+            }
+            function CategoryChange(){
+                var category = document.getElementById("Category").value;
+                product="";
+                switch(category)
+                {
+                    case "Electronics":
+                        
+                        LoadProduct(electronics);
+                    break;
+                    case "Footwear":
+                       
+                        LoadProduct(footwear);
+                    break;
+                    case "Fashion":
+                     
+                        LoadProduct(fashion);
+                    break;
+                    default:
+                        product=["Please Select Tje Category"]
+                        break;
+                    
+                }
+            }
+            var ProductDeatil;
+            function LoadProduct(categoryName){
+                ProductDeatil= categoryName;
+                document.getElementById("Product").innerHTML="";
+                  for(var item of categoryName){
+                    console.log(item)
+                    var option = document.createElement("option");
+                    option.value= item;
+                    option.text= item;
+                    document.getElementById("Product").appendChild(option);
+                  }
+            }
+            var searchedProduct = {};
+            function ProductChange(){
+
+                   var ProductName= document.getElementById("Product").value;
+                   searchedProduct = Product.find(function(product){
+                    return product.name==ProductName;
+                   });
+                   console.log(1);
+                   
+                   document.getElementById("lblName").innerHTML=searchedProduct.name;
+                   document.getElementById("lblPrice").innerHTML=`&#8377 ${searchedProduct.Price}`;
+                   document.getElementById("imgProduct").src =searchedProduct.Photo;
+
+
+
+            }
+            var cartItems=[];
+
+            function AddToCartClick(){
+                     console.log(1);
+                    var flag= false;
+                    cartItems=cartItems.map((item)=>{
+                        if(item.name===searchedProduct.name){
+                            flag=true;
+                            return {
+                                ...item,value:item.value+1,
+                               
+                            }
+                        }
+                        return item;
+                    })  
+                if(flag==false){
+                    cartItems.push({...searchedProduct,value:1})
+                }
+                GetCartItemsCount();
+            }
+
+
+            var count =0;
+            function GetCartItemsCount(){
+                
+                document.getElementById("count").innerHTML=++count;
+                LoadCartItems();
+              
+            }
+            function Remove(){
+               
+                cartItems=cartItems.map((item)=>{
+                        if(item.name===searchedProduct.name){
+                            flag=true;
+                            return {
+                                ...item,value:item.value-1,
+                               
+                            }
+                        }
+                        return item;
+                    })
+                    document.getElementById("count").innerHTML=--count;
+                LoadCartItems();
+
+            }
+            function LoadCartItems(){
+                document.querySelector("tbody").innerHTML="";
+                for(var item of cartItems)
+                {
+                    var tr = document.createElement("tr");
+                    var tdName = document.createElement("td");
+                    var tdCount = document.createElement("td");
+                    var tdPrice = document.createElement("td");
+                    var tdPhoto = document.createElement("td");
+                   
+
+                    tdName.innerHTML = item.name;
+                    tdCount.innerHTML= `<button class="bi bi-dash"style= "border:0 " onclick="Remove()"  ></button>${item.value}<button class="bi bi-plus" style= "border:0" onclick="AddToCartClick()"></button>`
+                    tdPrice.innerHTML = item.Price;
+
+                    var img = document.createElement("img");
+                    img.height= "50";
+                    img.width="50";
+                    img.src=item.Photo;
+
+                    tdPhoto.appendChild(img);
+
+                    
+
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdCount);
+                    tr.appendChild(tdPrice);
+                    tr.appendChild(tdPhoto);
+                    
+
+                    document.querySelector("tbody").appendChild(tr);
+                }
+
+                var price=0;
+                cartItems.map((item)=>{
+                    price= price+((item.Price)*item.value);
+                })
+
+                document.querySelector("tfoot").innerHTML=`
+                     <tr><td colspan="4"><b>Total Price</b>${price}</td></tr>              `;
+                
+
+            }
+        </script>
+        
+    </head>
+    <body class="container-fluid" onload="bodyload()">
+        <h1 class="text-center mt-2 p-3 bg-danger text-white " ><span class="bi bi-cart3"></span>Amazone Shopping</h1>
+        <div class="row">
+            <div class="col-3 ms-2">
+                <div class="mt-2">
+                  <label class="form-label">Select Category</label>
+                   <select class="form-select" onchange="CategoryChange()" id="Category">
+                   </select>
+
+                </div>
+                <div class="mt-2">
+                    <lable class="form-label" >Select Product</lable>
+                    <select class="form-select" id="Product" onchange="ProductChange()"  >
+
+                    </select>
+                </div>
+                <div class="mt-2">
+                    <label class="form-label">Preview</label>
+                    <div class="card">
+                       <diV class="card-header text-center">
+                          <h2 id="lblName"></h2>
+                       </diV>
+                       <div class="card-body text-center">
+                          <img id="imgProduct" width="200" height="200" alt="Image">
+                           <p id="lblPrice"></p>
+                          
+                       </div>
+                       <div class="card-footer">
+                           <button onclick="AddToCartClick()" class="btn btn-danger w-100">
+                            <span class="bi bi-cart4"></span>
+                            Add to Cart
+                          </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-7 text-center">
+                 
+            </div>
+
+            <div class="col">
+               <div class="mt-2 text-center">
+                
+            <div class="col">
+                <div class="mt-2">
+                   <button onclick="LoadCartItems()" class="btn btn-warning w-100" data-bs-target="#cart" data-bs-toggle="modal" >
+                       <span class="bi bi-cart2"></span>
+                       [<label id="count"></label>]
+                        Your Cart Items
+                   </button>
+                   <div class="modal fade" id="cart">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h3>Your Cart Items</h3>
+                                  <button class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <table class="table table-hover">
+                                      <thead>
+                                          <tr>
+                                              <th>Name</th>
+                                              <th>Quantity</th>
+                                              <th>Price</th>
+                                              <th>Preview</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+  
+                                      </tbody>
+                                      <tfoot class="text-bg-dark">
+                                      </tfoot>
+                                  </table>
+                              </div>
+                              <div class="modal-footer">
+                                  <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                              </div>
+                          </div>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+        </div>
+        <script src="../node_modules/jquery/dist/jquery.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+    </body>
+ </html>
